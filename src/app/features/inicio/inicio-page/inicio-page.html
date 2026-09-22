@@ -86,3 +86,35 @@
     }
   }
 </section>
+
+@if (iglesia(); as datos) {
+  <section class="tarjeta inicio__acerca-de" aria-label="Acerca de la iglesia">
+    <h2>Acerca de</h2>
+    @if (datos.pastor) {
+      <p><span class="inicio__acerca-etiqueta">Pastor:</span> {{ datos.pastor }}</p>
+    }
+    @if (datos.horarioEscuelaSabatica) {
+      <p><span class="inicio__acerca-etiqueta">Escuela Sabática:</span> {{ datos.horarioEscuelaSabatica }}</p>
+    }
+    @if (datos.horarioCulto) {
+      <p><span class="inicio__acerca-etiqueta">Culto:</span> {{ datos.horarioCulto }}</p>
+    }
+    @if (datos.horarioOracion) {
+      <p><span class="inicio__acerca-etiqueta">Oración:</span> {{ datos.horarioOracion }}</p>
+    }
+    @if (datos.telefono) {
+      <p><span class="inicio__acerca-etiqueta">Teléfono:</span> {{ datos.telefono }}</p>
+    }
+    @if (datos.email) {
+      <p><span class="inicio__acerca-etiqueta">Correo:</span> {{ datos.email }}</p>
+    }
+    @if (datos.direccion) {
+      <p><span class="inicio__acerca-etiqueta">Dirección:</span> {{ datos.direccion }}</p>
+    }
+    @if (datos.sitioWebOficial) {
+      <a class="inicio__acerca-enlace" [href]="datos.sitioWebOficial" target="_blank" rel="noopener">
+        Sitio web oficial →
+      </a>
+    }
+  </section>
+}

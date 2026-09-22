@@ -138,3 +138,34 @@
   justify-content: flex-end;
   gap: var(--espacio-sm);
 }
+
+.inicio__acerca-de {
+  margin-top: var(--espacio-lg);
+
+  h2 {
+    font-size: 17px;
+    margin-bottom: var(--espacio-sm);
+  }
+
+  p {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+}
+
+.inicio__acerca-etiqueta {
+  font-weight: 600;
+}
+
+.inicio__acerca-enlace {
+  display: inline-block;
+  margin-top: var(--espacio-sm);
+  color: var(--color-vino);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

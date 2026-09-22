@@ -26,6 +26,7 @@ export class InicioPage {
   private readonly iglesiaService = inject(IglesiaService);
 
   protected readonly nombreIglesia = computed(() => this.iglesiaService.iglesia()?.nombre ?? 'RDS Iglesia Adventista');
+  protected readonly iglesia = this.iglesiaService.iglesia;
 
   protected readonly accesos: AccesoDirecto[] = [
     { etiqueta: 'Boletín', ruta: '/boletin', icono: 'boletin' },

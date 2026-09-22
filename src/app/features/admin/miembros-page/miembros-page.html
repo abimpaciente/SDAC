@@ -12,6 +12,54 @@
       <span>Dirección</span>
       <input type="text" [ngModel]="direccionIglesia()" (ngModelChange)="direccionIglesia.set($event)" />
     </label>
+    <label class="miembros__campo">
+      <span>Pastor</span>
+      <input type="text" [ngModel]="pastorIglesia()" (ngModelChange)="pastorIglesia.set($event)" />
+    </label>
+    <label class="miembros__campo">
+      <span>Teléfono</span>
+      <input type="text" [ngModel]="telefonoIglesia()" (ngModelChange)="telefonoIglesia.set($event)" />
+    </label>
+    <label class="miembros__campo">
+      <span>Correo</span>
+      <input type="email" [ngModel]="emailIglesia()" (ngModelChange)="emailIglesia.set($event)" />
+    </label>
+    <label class="miembros__campo">
+      <span>Horario Escuela Sabática</span>
+      <input
+        type="text"
+        placeholder="p. ej. 10:00 am"
+        [ngModel]="horarioEscuelaSabaticaIglesia()"
+        (ngModelChange)="horarioEscuelaSabaticaIglesia.set($event)"
+      />
+    </label>
+    <label class="miembros__campo">
+      <span>Horario Culto</span>
+      <input
+        type="text"
+        placeholder="p. ej. 11:15 am"
+        [ngModel]="horarioCultoIglesia()"
+        (ngModelChange)="horarioCultoIglesia.set($event)"
+      />
+    </label>
+    <label class="miembros__campo">
+      <span>Horario de oración</span>
+      <input
+        type="text"
+        placeholder="p. ej. Miércoles 7:15 pm"
+        [ngModel]="horarioOracionIglesia()"
+        (ngModelChange)="horarioOracionIglesia.set($event)"
+      />
+    </label>
+    <label class="miembros__campo">
+      <span>Sitio web oficial</span>
+      <input
+        type="url"
+        placeholder="https://…"
+        [ngModel]="sitioWebOficialIglesia()"
+        (ngModelChange)="sitioWebOficialIglesia.set($event)"
+      />
+    </label>
     <div class="miembros__iglesia-acciones">
       <button type="button" class="boton-texto" (click)="cancelarEdicionIglesia()">Cancelar</button>
       <button type="button" class="boton-primario" [disabled]="guardandoIglesia()" (click)="guardarIglesia()">
@@ -22,6 +70,9 @@
     <h2>{{ iglesia()?.nombre || 'Nombre de la iglesia sin definir' }}</h2>
     @if (iglesia()?.direccion) {
       <p class="miembros__direccion">{{ iglesia()?.direccion }}</p>
+    }
+    @if (iglesia()?.pastor) {
+      <p class="miembros__direccion">Pastor: {{ iglesia()?.pastor }}</p>
     }
     <button type="button" class="boton-secundario" (click)="abrirEdicionIglesia()">Editar datos de la iglesia</button>
   }

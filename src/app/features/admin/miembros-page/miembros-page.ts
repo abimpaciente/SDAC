@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { MINISTERIOS_CONOCIDOS, Rol, Usuario } from '../../../core/models';
-import { IglesiaService } from '../../../core/services/iglesia.service';
+import { DatosIglesia, IglesiaService } from '../../../core/services/iglesia.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 
 const ROLES: { valor: Rol; etiqueta: string }[] = [
@@ -39,6 +39,13 @@ export class MiembrosPage {
   protected readonly guardandoIglesia = signal(false);
   protected readonly nombreIglesia = signal('');
   protected readonly direccionIglesia = signal('');
+  protected readonly pastorIglesia = signal('');
+  protected readonly telefonoIglesia = signal('');
+  protected readonly emailIglesia = signal('');
+  protected readonly horarioEscuelaSabaticaIglesia = signal('');
+  protected readonly horarioCultoIglesia = signal('');
+  protected readonly horarioOracionIglesia = signal('');
+  protected readonly sitioWebOficialIglesia = signal('');
 
   constructor() {
     // Solo administradores pueden estar aquí; a cualquier otro (o mientras
@@ -80,8 +87,16 @@ export class MiembrosPage {
   }
 
   protected abrirEdicionIglesia(): void {
-    this.nombreIglesia.set(this.iglesia()?.nombre ?? '');
-    this.direccionIglesia.set(this.iglesia()?.direccion ?? '');
+    const i = this.iglesia();
+    this.nombreIglesia.set(i?.nombre ?? '');
+    this.direccionIglesia.set(i?.direccion ?? '');
+    this.pastorIglesia.set(i?.pastor ?? '');
+    this.telefonoIglesia.set(i?.telefono ?? '');
+    this.emailIglesia.set(i?.email ?? '');
+    this.horarioEscuelaSabaticaIglesia.set(i?.horarioEscuelaSabatica ?? '');
+    this.horarioCultoIglesia.set(i?.horarioCulto ?? '');
+    this.horarioOracionIglesia.set(i?.horarioOracion ?? '');
+    this.sitioWebOficialIglesia.set(i?.sitioWebOficial ?? '');
     this.editandoIglesia.set(true);
   }
 
@@ -93,13 +108,21 @@ export class MiembrosPage {
     if (!this.nombreIglesia().trim()) {
       return;
     }
+    const datos: DatosIglesia = {
+      nombre: this.nombreIglesia().trim(),
+      direccion: this.direccionIglesia().trim(),
+      pastor: this.pastorIglesia().trim(),
+      telefono: this.telefonoIglesia().trim(),
+      email: this.emailIglesia().trim(),
+      horarioEscuelaSabatica: this.horarioEscuelaSabaticaIglesia().trim(),
+      horarioCulto: this.horarioCultoIglesia().trim(),
+      horarioOracion: this.horarioOracionIglesia().trim(),
+      sitioWebOficial: this.sitioWebOficialIglesia().trim(),
+    };
     this.guardandoIglesia.set(true);
     this.errorGuardado.set(null);
     try {
-      await this.iglesiaService.actualizar({
-        nombre: this.nombreIglesia().trim(),
-        direccion: this.direccionIglesia().trim(),
-      });
+      await this.iglesiaService.actualizar(datos);
       this.editandoIglesia.set(false);
     } catch (error) {
       this.errorGuardado.set(this.mensajeError(error));
