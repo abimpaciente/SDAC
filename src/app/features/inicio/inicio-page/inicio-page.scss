@@ -7,13 +7,24 @@
   margin-bottom: var(--espacio-lg);
 
   h1 {
-    font-size: 28px;
+    font-size: 26px;
+    margin-top: 2px;
   }
 
   p {
     color: var(--color-texto);
     opacity: 0.7;
   }
+}
+
+.inicio__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-vino);
+  opacity: 1;
 }
 
 .inicio__accesos {

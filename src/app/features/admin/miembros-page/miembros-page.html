@@ -1,7 +1,34 @@
 <header class="miembros__encabezado">
-  <h1>Miembros</h1>
-  <p>Asigna roles y ministerios. Los cambios se guardan al instante.</p>
+  <h1>Administrar</h1>
 </header>
+
+<section class="tarjeta miembros__iglesia">
+  @if (editandoIglesia()) {
+    <label class="miembros__campo">
+      <span>Nombre de la iglesia</span>
+      <input type="text" [ngModel]="nombreIglesia()" (ngModelChange)="nombreIglesia.set($event)" />
+    </label>
+    <label class="miembros__campo">
+      <span>Dirección</span>
+      <input type="text" [ngModel]="direccionIglesia()" (ngModelChange)="direccionIglesia.set($event)" />
+    </label>
+    <div class="miembros__iglesia-acciones">
+      <button type="button" class="boton-texto" (click)="cancelarEdicionIglesia()">Cancelar</button>
+      <button type="button" class="boton-primario" [disabled]="guardandoIglesia()" (click)="guardarIglesia()">
+        {{ guardandoIglesia() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  } @else {
+    <h2>{{ iglesia()?.nombre || 'Nombre de la iglesia sin definir' }}</h2>
+    @if (iglesia()?.direccion) {
+      <p class="miembros__direccion">{{ iglesia()?.direccion }}</p>
+    }
+    <button type="button" class="boton-secundario" (click)="abrirEdicionIglesia()">Editar datos de la iglesia</button>
+  }
+</section>
+
+<h2 class="miembros__subtitulo">Miembros</h2>
+<p class="miembros__ayuda">Asigna roles y ministerios. Los cambios se guardan al instante.</p>
 
 @if (cargando()) {
   <p class="miembros__vacio">Cargando…</p>

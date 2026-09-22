@@ -1,6 +1,6 @@
 {
-  "name": "maranatha",
-  "short_name": "maranatha",
+  "name": "RDS Iglesia Adventista",
+  "short_name": "RDS",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Evento } from '../../../core/models';
 import { DatosEvento, EventosService } from '../../../core/services/eventos.service';
+import { IglesiaService } from '../../../core/services/iglesia.service';
 
 interface AccesoDirecto {
   etiqueta: string;
@@ -22,6 +23,9 @@ interface AccesoDirecto {
 export class InicioPage {
   private readonly auth = inject(AuthService);
   private readonly eventosService = inject(EventosService);
+  private readonly iglesiaService = inject(IglesiaService);
+
+  protected readonly nombreIglesia = computed(() => this.iglesiaService.iglesia()?.nombre ?? 'RDS Iglesia Adventista');
 
   protected readonly accesos: AccesoDirecto[] = [
     { etiqueta: 'Boletín', ruta: '/boletin', icono: 'boletin' },
