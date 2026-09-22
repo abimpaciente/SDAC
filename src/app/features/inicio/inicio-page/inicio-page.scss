@@ -1,0 +1,66 @@
+:host {
+  display: block;
+  padding: var(--espacio-lg) var(--espacio-md) var(--espacio-md);
+}
+
+.inicio__encabezado {
+  margin-bottom: var(--espacio-lg);
+
+  h1 {
+    font-size: 28px;
+  }
+
+  p {
+    color: var(--color-texto);
+    opacity: 0.7;
+  }
+}
+
+.inicio__accesos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--espacio-sm);
+  margin-bottom: var(--espacio-lg);
+}
+
+.acceso-directo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 76px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-texto);
+  font-family: var(--font-display);
+  font-weight: 600;
+  transition: border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-vino);
+  }
+}
+
+.inicio__eventos h2 {
+  font-size: 20px;
+  margin-bottom: var(--espacio-sm);
+}
+
+.evento {
+  margin-bottom: var(--espacio-sm);
+
+  h3 {
+    font-size: 17px;
+  }
+
+  &__fecha {
+    color: var(--color-vino);
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  &__lugar {
+    opacity: 0.7;
+    margin-bottom: 0;
+  }
+}

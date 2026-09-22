@@ -1,0 +1,39 @@
+<header class="boletin__encabezado">
+  <h1>Boletín semanal</h1>
+  <button type="button" class="boton-exportar" (click)="exportarPdf()">Exportar a PDF</button>
+</header>
+
+<nav class="boletin__tabs" aria-label="Secciones del boletín">
+  @for (tab of tabs; track tab.clave) {
+    <button
+      type="button"
+      class="boletin__tab"
+      [class.boletin__tab--activa]="tabActiva() === tab.clave"
+      (click)="seleccionarTab(tab.clave)"
+    >
+      {{ tab.etiqueta }}
+    </button>
+  }
+</nav>
+
+<section class="tarjeta boletin__contenido">
+  @switch (tabActiva()) {
+    @case ('escuelaSabatica') {
+      @for (parte of partesEscuelaSabatica(); track parte.orden) {
+        <app-fila-boletin [parte]="parte" />
+      }
+    }
+    @case ('culto') {
+      @for (parte of partesCulto(); track parte.orden) {
+        <app-fila-boletin [parte]="parte" />
+      }
+    }
+    @case ('anuncios') {
+      <ol class="lista-anuncios">
+        @for (anuncio of boletin.anuncios; track anuncio.orden) {
+          <li [innerHTML]="formatearAnuncio(anuncio.texto)"></li>
+        }
+      </ol>
+    }
+  }
+</section>

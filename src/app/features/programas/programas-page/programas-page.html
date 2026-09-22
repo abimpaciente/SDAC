@@ -1,0 +1,31 @@
+<header class="programas__encabezado">
+  <h1>Programas</h1>
+</header>
+
+<nav class="programas__tabs" aria-label="Tipo de programa">
+  @for (tab of tabs; track tab.clave) {
+    <button
+      type="button"
+      class="programas__tab"
+      [class.programas__tab--activa]="tabActiva() === tab.clave"
+      (click)="seleccionarTab(tab.clave)"
+    >
+      {{ tab.etiqueta }}
+    </button>
+  }
+</nav>
+
+<section class="tarjeta programas__contenido">
+  @switch (tabActiva()) {
+    @case ('escuela-sabatica') {
+      @for (parte of flujoEscuelaSabatica(); track parte.orden) {
+        <app-fila-boletin [parte]="parte" />
+      }
+    }
+    @case ('jovenes') {
+      @for (parte of programaJovenes.partes; track parte.clave) {
+        <app-fila-boletin [parte]="{ titulo: parte.titulo, asignadoA: parte.asignadoA }" />
+      }
+    }
+  }
+</section>

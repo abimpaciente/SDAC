@@ -1,0 +1,118 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para Maranatha (app de iglesia,
+// multi-congregación). El rol y ministerio de cada usuario se validan
+// SIEMPRE del lado del servidor a partir de su propio documento en
+// `usuarios/{uid}` — nunca se confía en datos enviados por el cliente
+// para decidir permisos.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaAutenticado() {
+      return request.auth != null;
+    }
+
+    function miUsuario() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    function miRol() {
+      return miUsuario().rol;
+    }
+
+    function miMinisterio() {
+      return miUsuario().ministerio;
+    }
+
+    function miIglesiaId() {
+      return miUsuario().iglesiaId;
+    }
+
+    function perteneceAIglesia(iglesiaId) {
+      return estaAutenticado() && miIglesiaId() == iglesiaId;
+    }
+
+    function esAdmin() {
+      return estaAutenticado() && miRol() == 'administrador';
+    }
+
+    function esSecretario() {
+      return estaAutenticado() && (miRol() == 'secretario' || esAdmin());
+    }
+
+    function esLiderDeMinisterio() {
+      return estaAutenticado() && miRol() == 'lider_ministerio';
+    }
+
+    // Mapea el ministerio de un líder a la sección del boletín que puede
+    // editar. Ajustar si se agregan más ministerios con sección propia.
+    function seccionDeMiMinisterio() {
+      return miMinisterio() == 'Escuela Sabática' ? 'escuelaSabatica'
+        : miMinisterio() == 'Culto' ? 'culto'
+        : null;
+    }
+
+    function soloTocaMiSeccionDelBoletin() {
+      let seccion = seccionDeMiMinisterio();
+      return seccion != null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([seccion]);
+    }
+
+    match /iglesias/{iglesiaId} {
+      allow read: if estaAutenticado();
+      allow write: if esAdmin() && perteneceAIglesia(iglesiaId);
+    }
+
+    match /usuarios/{userId} {
+      allow read: if estaAutenticado() && perteneceAIglesia(resource.data.iglesiaId);
+      allow create: if estaAutenticado() && request.auth.uid == userId;
+      // Un usuario puede editar su propio perfil pero no su rol/iglesia;
+      // solo un administrador puede cambiar roles o ministerio asignado.
+      allow update: if estaAutenticado() && (
+        (
+          request.auth.uid == userId &&
+          request.resource.data.rol == resource.data.rol &&
+          request.resource.data.iglesiaId == resource.data.iglesiaId
+        ) ||
+        esAdmin()
+      );
+      allow delete: if esAdmin();
+    }
+
+    match /boletines/{boletinId} {
+      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow create: if esSecretario();
+      allow update: if perteneceAIglesia(resource.data.iglesiaId) && (
+        esSecretario() ||
+        (esLiderDeMinisterio() && soloTocaMiSeccionDelBoletin())
+      );
+      allow delete: if esAdmin();
+    }
+
+    match /contribuciones/{contribucionId} {
+      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow create: if estaAutenticado() &&
+        request.resource.data.autorId == request.auth.uid &&
+        perteneceAIglesia(request.resource.data.iglesiaId);
+      // El autor puede editar su propio mensaje; marcar
+      // `agregadoABoletin` queda reservado a líderes/secretaría/admin.
+      allow update: if perteneceAIglesia(resource.data.iglesiaId) && (
+        (resource.data.autorId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['texto', 'tipo'])) ||
+        (esLiderDeMinisterio() || esSecretario())
+      );
+      allow delete: if resource.data.autorId == request.auth.uid || esAdmin();
+    }
+
+    match /programasJovenes/{fecha} {
+      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow write: if perteneceAIglesia(request.resource.data.iglesiaId) &&
+        (esSecretario() || (esLiderDeMinisterio() && miMinisterio() == 'Sociedad de Jóvenes'));
+    }
+
+    match /eventos/{eventoId} {
+      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow write: if esSecretario();
+    }
+  }
+}

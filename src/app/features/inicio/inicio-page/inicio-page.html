@@ -1,0 +1,27 @@
+<header class="inicio__encabezado">
+  <h1>Maranatha</h1>
+  <p>Bienvenido/a a la comunidad</p>
+</header>
+
+<section class="inicio__accesos" aria-label="Accesos directos">
+  @for (acceso of accesos; track acceso.ruta + (acceso.queryParams?.['tab'] ?? '')) {
+    <a class="acceso-directo tarjeta" [routerLink]="acceso.ruta" [queryParams]="acceso.queryParams">
+      <span class="acceso-directo__etiqueta">{{ acceso.etiqueta }}</span>
+    </a>
+  }
+</section>
+
+<section class="inicio__eventos" aria-label="Próximos eventos">
+  <h2>Próximos eventos</h2>
+
+  @for (evento of eventos; track evento.id) {
+    <article class="evento tarjeta">
+      <h3>{{ evento.titulo }}</h3>
+      <p class="evento__fecha">{{ formatearFecha(evento.fecha) }}</p>
+      <p>{{ evento.descripcion }}</p>
+      <p class="evento__lugar">{{ evento.lugar }}</p>
+    </article>
+  } @empty {
+    <p>No hay eventos programados por ahora.</p>
+  }
+</section>

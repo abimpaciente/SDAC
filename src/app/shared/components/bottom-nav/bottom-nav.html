@@ -1,0 +1,51 @@
+<nav class="nav-inferior" aria-label="Navegación principal">
+  @for (item of items; track item.ruta) {
+    <a
+      class="nav-inferior__item"
+      [routerLink]="item.ruta"
+      routerLinkActive="nav-inferior__item--activo"
+    >
+      <span class="nav-inferior__icono">
+        @switch (item.icono) {
+          @case ('inicio') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M3 11.5 12 4l9 7.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path
+                d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          }
+          @case ('compartir') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path
+                d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H9l-4.5 4v-4H5.5A1.5 1.5 0 0 1 4 14.5v-9Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          }
+          @case ('boletin') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path
+                d="M6 3.5h9L19 7.5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path d="M15 3.5V8h4" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M8 12h8M8 15.5h8M8 8.5h3" stroke-linecap="round" />
+            </svg>
+          }
+          @case ('programas') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <rect x="4" y="5" width="16" height="15" rx="2" />
+              <path d="M8 3v4M16 3v4M4 10h16" stroke-linecap="round" />
+            </svg>
+          }
+        }
+      </span>
+      <span class="nav-inferior__etiqueta">{{ item.etiqueta }}</span>
+    </a>
+  }
+</nav>

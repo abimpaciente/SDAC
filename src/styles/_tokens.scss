@@ -1,0 +1,39 @@
+// Tokens del sistema de diseño de Maranatha.
+// Expuestos como custom properties para que también estén disponibles
+// dentro de los estilos encapsulados de cada componente.
+
+:root {
+  // Superficies y texto
+  --color-fondo: #faf6ee;
+  --color-texto: #2a2420;
+  --color-tarjeta: #ffffff;
+  --color-borde: #e7dcc8;
+
+  // Acentos
+  --color-vino: #7b3232;
+  --color-vino-oscuro: #5f2626;
+  --color-dorado: #b98a2e;
+  --color-dorado-suave: #f4e6cc;
+
+  // Categorías / estados
+  --color-salvia: #dce7de;
+  --color-salvia-texto: #3e6650;
+  --color-terracota: #ead9d9;
+  --color-terracota-texto: #7b3232;
+
+  // Tipografía
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+
+  // Radios y espaciado
+  --radio-tarjeta: 14px;
+  --radio-chip: 999px;
+  --espacio-xs: 4px;
+  --espacio-sm: 8px;
+  --espacio-md: 16px;
+  --espacio-lg: 24px;
+  --espacio-xl: 32px;
+
+  // Nav inferior
+  --alto-nav-inferior: 64px;
+}

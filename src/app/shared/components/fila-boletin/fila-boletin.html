@@ -1,0 +1,14 @@
+<div class="fila-boletin">
+  <span class="fila-boletin__titulo">{{ parte().titulo }}</span>
+
+  @if (parte().valor || parte().asignadoA) {
+    <span class="fila-boletin__valor">
+      {{ parte().valor || parte().asignadoA }}
+      @if (parte().valor && parte().asignadoA) {
+        <span class="fila-boletin__responsable">— {{ parte().asignadoA }}</span>
+      }
+    </span>
+  } @else {
+    <span class="fila-boletin__valor por-asignar">Por asignar</span>
+  }
+</div>

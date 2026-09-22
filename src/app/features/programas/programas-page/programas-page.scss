@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  padding: var(--espacio-lg) var(--espacio-md) var(--espacio-md);
+}
+
+.programas__encabezado h1 {
+  font-size: 24px;
+  margin-bottom: var(--espacio-md);
+}
+
+.programas__tabs {
+  display: flex;
+  gap: var(--espacio-xs);
+  background: var(--color-dorado-suave);
+  border-radius: var(--radio-chip);
+  padding: 4px;
+  margin-bottom: var(--espacio-md);
+}
+
+.programas__tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: var(--radio-chip);
+  padding: 8px 4px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-texto);
+  cursor: pointer;
+
+  &--activa {
+    background: var(--color-vino);
+    color: #fff;
+  }
+}

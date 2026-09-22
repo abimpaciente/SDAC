@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// Reglas de Storage: imágenes/audio quedan bajo /iglesias/{iglesiaId}/...
+// y solo miembros autenticados de esa congregación pueden leer o escribir.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /iglesias/{iglesiaId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        request.resource.size < 20 * 1024 * 1024;
+    }
+  }
+}

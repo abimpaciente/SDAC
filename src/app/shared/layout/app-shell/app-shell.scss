@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+.app-shell__contenido {
+  min-height: 100vh;
+  padding-bottom: calc(var(--alto-nav-inferior) + var(--espacio-md));
+}
