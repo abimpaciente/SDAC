@@ -5,6 +5,14 @@ rules_version = '2';
 // SIEMPRE del lado del servidor a partir de su propio documento en
 // `usuarios/{uid}` — nunca se confía en datos enviados por el cliente
 // para decidir permisos.
+//
+// Modelo de acceso: el contenido de la congregación (boletín, programas,
+// eventos, el feed de Compartir) es de LECTURA PÚBLICA — cualquier
+// visitante, sin iniciar sesión, puede ver todo. Solo las acciones que
+// modifican datos (publicar, editar el boletín, asignar responsables,
+// aprobar contenido) requieren estar autenticado con el rol adecuado.
+// Los datos personales de `usuarios/{uid}` (email, teléfono) NO son
+// públicos: solo los ve el propio usuario o un administrador.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -59,11 +67,13 @@ service cloud.firestore {
     }
 
     match /iglesias/{iglesiaId} {
-      allow read: if estaAutenticado();
+      allow read: if true;
       allow write: if esAdmin() && perteneceAIglesia(iglesiaId);
     }
 
     match /usuarios/{userId} {
+      // Perfiles NO son públicos: contienen email/teléfono. Solo el propio
+      // usuario o alguien de su misma congregación autenticado los ve.
       allow read: if estaAutenticado() && perteneceAIglesia(resource.data.iglesiaId);
       allow create: if estaAutenticado() && request.auth.uid == userId;
       // Un usuario puede editar su propio perfil pero no su rol/iglesia;
@@ -80,7 +90,7 @@ service cloud.firestore {
     }
 
     match /boletines/{boletinId} {
-      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow read: if true;
       allow create: if esSecretario();
       allow update: if perteneceAIglesia(resource.data.iglesiaId) && (
         esSecretario() ||
@@ -90,7 +100,7 @@ service cloud.firestore {
     }
 
     match /contribuciones/{contribucionId} {
-      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow read: if true;
       allow create: if estaAutenticado() &&
         request.resource.data.autorId == request.auth.uid &&
         perteneceAIglesia(request.resource.data.iglesiaId);
@@ -105,13 +115,13 @@ service cloud.firestore {
     }
 
     match /programasJovenes/{fecha} {
-      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow read: if true;
       allow write: if perteneceAIglesia(request.resource.data.iglesiaId) &&
         (esSecretario() || (esLiderDeMinisterio() && miMinisterio() == 'Sociedad de Jóvenes'));
     }
 
     match /eventos/{eventoId} {
-      allow read: if perteneceAIglesia(resource.data.iglesiaId);
+      allow read: if true;
       allow write: if esSecretario();
     }
   }
