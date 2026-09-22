@@ -21,6 +21,7 @@ export class ContribucionesService {
 
   readonly contribuciones = signal<Contribucion[]>([]);
   readonly cargando = signal(true);
+  readonly errorCarga = signal<string | null>(null);
 
   constructor() {
     const consulta = query(
@@ -29,12 +30,21 @@ export class ContribucionesService {
       orderBy('fecha', 'desc'),
     );
 
-    onSnapshot(consulta, (snapshot) => {
-      this.contribuciones.set(
-        snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Contribucion),
-      );
-      this.cargando.set(false);
-    });
+    onSnapshot(
+      consulta,
+      (snapshot) => {
+        this.contribuciones.set(
+          snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Contribucion),
+        );
+        this.cargando.set(false);
+        this.errorCarga.set(null);
+      },
+      (error) => {
+        console.error('Error al escuchar contribuciones:', error);
+        this.errorCarga.set(error.message);
+        this.cargando.set(false);
+      },
+    );
   }
 
   async publicar(autor: Usuario, tipo: TipoContribucion, texto: string): Promise<void> {

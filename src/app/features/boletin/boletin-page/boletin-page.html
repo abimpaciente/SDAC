@@ -16,6 +16,13 @@
   }
 </nav>
 
+@if (errorCarga()) {
+  <p class="boletin__error">No se pudo cargar el boletín: {{ errorCarga() }}</p>
+}
+@if (errorGuardado()) {
+  <p class="boletin__error">{{ errorGuardado() }}</p>
+}
+
 @if (cargando()) {
   <p class="boletin__vacio">Cargando…</p>
 } @else if (!boletin()) {
@@ -28,6 +35,27 @@
     }
   </section>
 } @else {
+  @if (editandoEncabezado()) {
+    <div class="tarjeta boletin__encabezado-editor">
+      <label class="boletin__encabezado-campo">
+        <span>Hora del culto (p. ej. 10:55 AM)</span>
+        <input type="text" [ngModel]="horaCulto()" (ngModelChange)="horaCulto.set($event)" />
+      </label>
+      <label class="boletin__encabezado-campo">
+        <span>Ocaso / Sunset (p. ej. 8:09 pm)</span>
+        <input type="text" [ngModel]="ocaso()" (ngModelChange)="ocaso.set($event)" />
+      </label>
+      <div class="boletin__encabezado-acciones">
+        <button type="button" class="boton-texto" (click)="cancelarEdicionEncabezado()">Cancelar</button>
+        <button type="button" class="boton-primario" (click)="guardarEncabezado()">Guardar</button>
+      </div>
+    </div>
+  } @else if (puedeEditarTodo()) {
+    <button type="button" class="boletin__encabezado-boton" (click)="abrirEdicionEncabezado()">
+      Ocaso: {{ boletin()!.ocaso || 'sin definir' }} · Culto: {{ boletin()!.horaCulto || 'sin definir' }} · Editar
+    </button>
+  }
+
   <section class="tarjeta boletin__contenido">
     @switch (tabActiva()) {
       @case ('escuelaSabatica') {
@@ -83,4 +111,66 @@
       }
     }
   </section>
+
+  <div class="boletin-impresion">
+    <header class="boletin-impresion__cabecera">
+      <p class="boletin-impresion__fecha">
+        {{ fechaLarga() }}
+        @if (boletin()!.ocaso) {
+          <span class="boletin-impresion__ocaso">Sunset: {{ boletin()!.ocaso }}</span>
+        }
+      </p>
+      <p class="boletin-impresion__iglesia">{{ nombreIglesia() }}</p>
+    </header>
+
+    <div class="boletin-impresion__columnas">
+      <section class="boletin-impresion__columna">
+        <h2>Programa de Escuela Sabática</h2>
+        @for (fila of partesEscuelaSabatica(); track fila.parte.orden) {
+          <div class="boletin-impresion__fila">
+            <span class="boletin-impresion__titulo">{{ fila.parte.titulo }}</span>
+            <span class="boletin-impresion__valor">
+              @if (fila.parte.valor || fila.parte.asignadoA) {
+                {{ fila.parte.valor || fila.parte.asignadoA }}
+              } @else {
+                <span class="por-asignar">Por asignar</span>
+              }
+            </span>
+          </div>
+        }
+      </section>
+
+      <section class="boletin-impresion__columna">
+        <h2>
+          Servicio de Adoración
+          @if (boletin()!.horaCulto) {
+            – {{ boletin()!.horaCulto }}
+          }
+        </h2>
+        @for (fila of partesCulto(); track fila.parte.orden) {
+          <div class="boletin-impresion__fila">
+            <span class="boletin-impresion__titulo">{{ fila.parte.titulo }}</span>
+            <span class="boletin-impresion__valor">
+              @if (fila.parte.valor || fila.parte.asignadoA) {
+                {{ fila.parte.valor || fila.parte.asignadoA }}
+              } @else {
+                <span class="por-asignar">Por asignar</span>
+              }
+            </span>
+          </div>
+        }
+      </section>
+    </div>
+
+    <section class="boletin-impresion__anuncios">
+      <h2>Anuncios</h2>
+      <ol>
+        @for (anuncio of boletin()!.anuncios; track anuncio.orden) {
+          <li [innerHTML]="formatearAnuncio(anuncio.texto)"></li>
+        } @empty {
+          <li class="por-asignar">Sin anuncios</li>
+        }
+      </ol>
+    </section>
+  </div>
 }

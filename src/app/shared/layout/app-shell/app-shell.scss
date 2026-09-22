@@ -16,6 +16,16 @@ $ancho-app: 480px;
   }
 }
 
+// Al imprimir, la vista de impresión del boletín necesita todo el ancho de
+// la página, no la columna angosta de escritorio.
+@media print {
+  :host {
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+  }
+}
+
 .barra-sesion {
   min-height: 36px;
 }

@@ -25,6 +25,8 @@ export class CompartirPage {
   protected readonly tipos = TIPOS_CONTRIBUCION;
   protected readonly filtro = signal<Filtro>('todos');
   protected readonly enviando = signal(false);
+  protected readonly errorCarga = this.contribucionesService.errorCarga;
+  protected readonly errorGuardado = signal<string | null>(null);
 
   protected readonly usuario = this.auth.usuario;
   protected readonly sesionResuelta = computed(() => !this.auth.cargando());
@@ -53,9 +55,12 @@ export class CompartirPage {
 
     const { tipo, texto } = this.form.getRawValue();
     this.enviando.set(true);
+    this.errorGuardado.set(null);
     try {
       await this.contribucionesService.publicar(autor, tipo, texto.trim());
       this.form.reset({ tipo, texto: '' });
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
     } finally {
       this.enviando.set(false);
     }
@@ -66,6 +71,19 @@ export class CompartirPage {
       await this.router.navigateByUrl('/login?volver=/compartir');
       return;
     }
-    await this.contribucionesService.alternarCandidato(contribucion);
+    this.errorGuardado.set(null);
+    try {
+      await this.contribucionesService.alternarCandidato(contribucion);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
+    }
+  }
+
+  private mensajeError(error: unknown): string {
+    const codigo = (error as { code?: string })?.code;
+    if (codigo === 'permission-denied') {
+      return 'No tienes permiso para hacer esto.';
+    }
+    return 'No se pudo guardar. Intenta de nuevo.';
   }
 }

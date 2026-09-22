@@ -15,17 +15,34 @@
   }
 </nav>
 
-<section class="tarjeta programas__contenido">
-  @switch (tabActiva()) {
-    @case ('escuela-sabatica') {
-      @for (parte of flujoEscuelaSabatica(); track parte.orden) {
-        <app-fila-boletin [parte]="parte" />
-      }
+@switch (tabActiva()) {
+  @case ('matutino') {
+    @if (cargando()) {
+      <p class="programas__vacio">Cargando…</p>
+    } @else if (!boletin()) {
+      <p class="programas__vacio">Todavía no se ha creado el boletín de esta semana.</p>
+    } @else {
+      <h2 class="programas__subtitulo">Escuela Sabática</h2>
+      <section class="tarjeta programas__contenido">
+        @for (fila of partesEscuelaSabatica(); track fila.parte.orden) {
+          <app-fila-boletin [parte]="fila.parte" />
+        }
+      </section>
+
+      <h2 class="programas__subtitulo">Culto</h2>
+      <section class="tarjeta programas__contenido">
+        @for (fila of partesCulto(); track fila.parte.orden) {
+          <app-fila-boletin [parte]="fila.parte" />
+        }
+      </section>
     }
-    @case ('jovenes') {
+  }
+  @case ('vespertino') {
+    <h2 class="programas__subtitulo">Sociedad de Jóvenes</h2>
+    <section class="tarjeta programas__contenido">
       @for (parte of programaJovenes.partes; track parte.clave) {
         <app-fila-boletin [parte]="{ titulo: parte.titulo, asignadoA: parte.asignadoA }" />
       }
-    }
+    </section>
   }
-</section>
+}

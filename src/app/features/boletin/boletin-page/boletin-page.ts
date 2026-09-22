@@ -1,20 +1,18 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../../core/auth/auth.service';
-import { AnuncioBoletin, ParteBoletin, SeccionCulto } from '../../../core/models';
-import { BoletinService, SeccionConPartes } from '../../../core/services/boletin.service';
+import { AnuncioBoletin } from '../../../core/models';
+import { BoletinService, FilaEscuelaSabatica, SeccionConPartes } from '../../../core/services/boletin.service';
 import { ContribucionesService } from '../../../core/services/contribuciones.service';
+import { IglesiaService } from '../../../core/services/iglesia.service';
 import { CandidatoSugerido, FilaBoletin } from '../../../shared/components/fila-boletin/fila-boletin';
 
 type TabBoletin = 'escuelaSabatica' | 'culto' | 'anuncios';
 
-type FilaEscuelaSabatica =
-  | { tipo: 'campo'; clave: string; parte: ParteBoletin }
-  | { tipo: 'clase'; indice: number; parte: ParteBoletin };
-
 @Component({
   selector: 'app-boletin-page',
-  imports: [FilaBoletin],
+  imports: [FilaBoletin, FormsModule],
   templateUrl: './boletin-page.html',
   styleUrl: './boletin-page.scss',
 })
@@ -22,6 +20,21 @@ export class BoletinPage {
   private readonly auth = inject(AuthService);
   private readonly boletinService = inject(BoletinService);
   private readonly contribucionesService = inject(ContribucionesService);
+  private readonly iglesiaService = inject(IglesiaService);
+
+  protected readonly nombreIglesia = computed(() => this.iglesiaService.iglesia()?.nombre ?? 'RDS Iglesia Adventista');
+
+  protected readonly fechaLarga = computed(() => {
+    const boletin = this.boletin();
+    if (!boletin) return '';
+    // Se parsea como fecha local (no UTC) sumando la hora del mediodía,
+    // para que no se corra un día por el desfase de zona horaria.
+    return new Date(`${boletin.fecha}T12:00:00`).toLocaleDateString('es', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  });
 
   protected readonly tabs: { clave: TabBoletin; etiqueta: string }[] = [
     { clave: 'escuelaSabatica', etiqueta: 'Escuela Sabática' },
@@ -33,7 +46,9 @@ export class BoletinPage {
 
   protected readonly boletin = this.boletinService.boletin;
   protected readonly cargando = this.boletinService.cargando;
+  protected readonly errorCarga = this.boletinService.errorCarga;
   protected readonly creando = signal(false);
+  protected readonly errorGuardado = signal<string | null>(null);
 
   protected readonly puedeEditarTodo = computed(() => {
     const rol = this.auth.usuario()?.rol;
@@ -61,38 +76,15 @@ export class BoletinPage {
       .map((c) => ({ id: c.id, texto: c.texto, autorNombre: c.autorNombre })),
   );
 
-  protected readonly partesEscuelaSabatica = computed<FilaEscuelaSabatica[]>(() => {
-    const seccion = this.boletin()?.escuelaSabatica;
-    if (!seccion) {
-      return [];
-    }
-    const campos: FilaEscuelaSabatica[] = [
-      { tipo: 'campo', clave: 'alabanzas', parte: seccion.alabanzas },
-      { tipo: 'campo', clave: 'bienvenida', parte: seccion.bienvenida },
-      { tipo: 'campo', clave: 'himnoInicial', parte: seccion.himnoInicial },
-      { tipo: 'campo', clave: 'lecturaBiblica', parte: seccion.lecturaBiblica },
-      { tipo: 'campo', clave: 'oracion', parte: seccion.oracion },
-      { tipo: 'campo', clave: 'elMisionero', parte: seccion.elMisionero },
-      { tipo: 'campo', clave: 'musicaEspecial', parte: seccion.musicaEspecial },
-      { tipo: 'campo', clave: 'himnoFinal', parte: seccion.himnoFinal },
-      { tipo: 'campo', clave: 'oracionFinal', parte: seccion.oracionFinal },
-      ...seccion.divisionClases.map((parte, indice): FilaEscuelaSabatica => ({ tipo: 'clase', indice, parte })),
-    ];
-    return campos.sort((a, b) => a.parte.orden - b.parte.orden);
-  });
-
-  protected readonly partesCulto = computed<{ clave: string; parte: ParteBoletin }[]>(() => {
-    const seccion = this.boletin()?.culto;
-    if (!seccion) {
-      return [];
-    }
-    return (Object.keys(seccion) as (keyof SeccionCulto)[])
-      .map((clave) => ({ clave, parte: seccion[clave] }))
-      .sort((a, b) => a.parte.orden - b.parte.orden);
-  });
+  protected readonly partesEscuelaSabatica = this.boletinService.partesEscuelaSabatica;
+  protected readonly partesCulto = this.boletinService.partesCulto;
 
   protected readonly editandoAnuncios = signal(false);
   protected readonly textoAnuncios = signal('');
+
+  protected readonly editandoEncabezado = signal(false);
+  protected readonly ocaso = signal('');
+  protected readonly horaCulto = signal('');
 
   protected seleccionarTab(tab: TabBoletin): void {
     this.tabActiva.set(tab);
@@ -104,8 +96,11 @@ export class BoletinPage {
 
   protected async crearBoletin(): Promise<void> {
     this.creando.set(true);
+    this.errorGuardado.set(null);
     try {
       await this.boletinService.crearBoletinDeEstaSemana();
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
     } finally {
       this.creando.set(false);
     }
@@ -115,10 +110,15 @@ export class BoletinPage {
     fila: FilaEscuelaSabatica,
     cambios: { valor: string; asignadoA: string | null },
   ): Promise<void> {
-    if (fila.tipo === 'clase') {
-      await this.boletinService.actualizarClase(fila.indice, cambios.valor, cambios.asignadoA);
-    } else {
-      await this.boletinService.actualizarParte('escuelaSabatica', fila.clave, cambios.valor, cambios.asignadoA);
+    this.errorGuardado.set(null);
+    try {
+      if (fila.tipo === 'clase') {
+        await this.boletinService.actualizarClase(fila.indice, cambios.valor, cambios.asignadoA);
+      } else {
+        await this.boletinService.actualizarParte('escuelaSabatica', fila.clave, cambios.valor, cambios.asignadoA);
+      }
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
     }
   }
 
@@ -126,7 +126,12 @@ export class BoletinPage {
     clave: string,
     cambios: { valor: string; asignadoA: string | null },
   ): Promise<void> {
-    await this.boletinService.actualizarParte('culto', clave, cambios.valor, cambios.asignadoA);
+    this.errorGuardado.set(null);
+    try {
+      await this.boletinService.actualizarParte('culto', clave, cambios.valor, cambios.asignadoA);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
+    }
   }
 
   protected abrirEdicionAnuncios(): void {
@@ -144,8 +149,41 @@ export class BoletinPage {
       .map((linea) => linea.trim())
       .filter((linea) => linea.length > 0)
       .map((texto, i) => ({ orden: i + 1, texto }));
-    await this.boletinService.actualizarAnuncios(anuncios);
-    this.editandoAnuncios.set(false);
+    this.errorGuardado.set(null);
+    try {
+      await this.boletinService.actualizarAnuncios(anuncios);
+      this.editandoAnuncios.set(false);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
+    }
+  }
+
+  protected abrirEdicionEncabezado(): void {
+    this.ocaso.set(this.boletin()?.ocaso ?? '');
+    this.horaCulto.set(this.boletin()?.horaCulto ?? '');
+    this.editandoEncabezado.set(true);
+  }
+
+  protected cancelarEdicionEncabezado(): void {
+    this.editandoEncabezado.set(false);
+  }
+
+  protected async guardarEncabezado(): Promise<void> {
+    this.errorGuardado.set(null);
+    try {
+      await this.boletinService.actualizarEncabezado(this.ocaso().trim(), this.horaCulto().trim());
+      this.editandoEncabezado.set(false);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
+    }
+  }
+
+  private mensajeError(error: unknown): string {
+    const codigo = (error as { code?: string })?.code;
+    if (codigo === 'permission-denied') {
+      return 'No tienes permiso para hacer esto.';
+    }
+    return 'No se pudo guardar. Intenta de nuevo.';
   }
 
   protected formatearAnuncio(texto: string): string {

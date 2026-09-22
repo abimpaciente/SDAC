@@ -23,6 +23,13 @@
   }
 </nav>
 
+@if (errorCarga()) {
+  <p class="compartir__error">No se pudo cargar el feed: {{ errorCarga() }}</p>
+}
+@if (errorGuardado()) {
+  <p class="compartir__error">{{ errorGuardado() }}</p>
+}
+
 @if (sesionResuelta()) {
   @if (usuario(); as autor) {
     <form class="tarjeta compartir__composer" [formGroup]="form" (ngSubmit)="publicar()">

@@ -24,6 +24,8 @@ export class EventosService {
 
   readonly eventos = signal<Evento[]>([]);
   readonly cargando = signal(true);
+  /** Si la escucha en tiempo real falla (p. ej. falta un índice de Firestore), queda aquí en vez de fallar en silencio. */
+  readonly errorCarga = signal<string | null>(null);
 
   constructor() {
     const consulta = query(
@@ -31,10 +33,19 @@ export class EventosService {
       where('iglesiaId', '==', environment.iglesiaIdPorDefecto),
       orderBy('fecha', 'asc'),
     );
-    onSnapshot(consulta, (snapshot) => {
-      this.eventos.set(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Evento));
-      this.cargando.set(false);
-    });
+    onSnapshot(
+      consulta,
+      (snapshot) => {
+        this.eventos.set(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Evento));
+        this.cargando.set(false);
+        this.errorCarga.set(null);
+      },
+      (error) => {
+        console.error('Error al escuchar eventos:', error);
+        this.errorCarga.set(error.message);
+        this.cargando.set(false);
+      },
+    );
   }
 
   async crear(datos: DatosEvento): Promise<void> {

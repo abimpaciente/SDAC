@@ -105,6 +105,12 @@
   }
 }
 
+.miembros__error {
+  color: var(--color-vino);
+  font-size: 14px;
+  margin: 0 0 var(--espacio-sm);
+}
+
 .miembros__vacio {
   text-align: center;
   opacity: 0.6;

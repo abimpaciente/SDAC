@@ -12,17 +12,27 @@ export class UsuariosService {
 
   readonly usuarios = signal<Usuario[]>([]);
   readonly cargando = signal(true);
+  readonly errorCarga = signal<string | null>(null);
 
   constructor() {
     const consulta = query(this.coleccion, where('iglesiaId', '==', environment.iglesiaIdPorDefecto));
-    onSnapshot(consulta, (snapshot) => {
-      this.usuarios.set(
-        snapshot.docs
-          .map((d) => d.data() as Usuario)
-          .sort((a, b) => a.nombre.localeCompare(b.nombre)),
-      );
-      this.cargando.set(false);
-    });
+    onSnapshot(
+      consulta,
+      (snapshot) => {
+        this.usuarios.set(
+          snapshot.docs
+            .map((d) => d.data() as Usuario)
+            .sort((a, b) => a.nombre.localeCompare(b.nombre)),
+        );
+        this.cargando.set(false);
+        this.errorCarga.set(null);
+      },
+      (error) => {
+        console.error('Error al escuchar usuarios:', error);
+        this.errorCarga.set(error.message);
+        this.cargando.set(false);
+      },
+    );
   }
 
   async actualizarRol(uid: string, rol: Rol, ministerio: string | null): Promise<void> {

@@ -30,15 +30,15 @@ export class InicioPage {
   protected readonly accesos: AccesoDirecto[] = [
     { etiqueta: 'Boletín', ruta: '/boletin', icono: 'boletin' },
     {
-      etiqueta: 'Escuela Sabática',
+      etiqueta: 'Programa matutino',
       ruta: '/programas',
-      queryParams: { tab: 'escuela-sabatica' },
+      queryParams: { tab: 'matutino' },
       icono: 'escuela',
     },
     {
-      etiqueta: 'Sociedad de Jóvenes',
+      etiqueta: 'Programa vespertino',
       ruta: '/programas',
-      queryParams: { tab: 'jovenes' },
+      queryParams: { tab: 'vespertino' },
       icono: 'jovenes',
     },
     { etiqueta: 'Compartir', ruta: '/compartir', icono: 'compartir' },
@@ -46,6 +46,8 @@ export class InicioPage {
 
   protected readonly eventos = this.eventosService.eventos;
   protected readonly cargando = this.eventosService.cargando;
+  protected readonly errorCargaEventos = this.eventosService.errorCarga;
+  protected readonly errorGuardado = signal<string | null>(null);
 
   protected readonly puedeEditar = computed(() => {
     const rol = this.auth.usuario()?.rol;
@@ -104,6 +106,7 @@ export class InicioPage {
       descripcion: this.descripcion().trim(),
     };
     this.guardando.set(true);
+    this.errorGuardado.set(null);
     try {
       const id = this.editandoId();
       if (id) {
@@ -112,14 +115,29 @@ export class InicioPage {
         await this.eventosService.crear(datos);
       }
       this.mostrandoFormulario.set(false);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
     } finally {
       this.guardando.set(false);
     }
   }
 
   protected async eliminar(evento: Evento): Promise<void> {
-    if (confirm(`¿Eliminar "${evento.titulo}"?`)) {
-      await this.eventosService.eliminar(evento.id);
+    if (!confirm(`¿Eliminar "${evento.titulo}"?`)) {
+      return;
     }
+    try {
+      await this.eventosService.eliminar(evento.id);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
+    }
+  }
+
+  private mensajeError(error: unknown): string {
+    const codigo = (error as { code?: string })?.code;
+    if (codigo === 'permission-denied') {
+      return 'No tienes permiso para hacer esto.';
+    }
+    return 'No se pudo guardar. Intenta de nuevo.';
   }
 }

@@ -19,6 +19,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@media print {
+  body {
+    background: #fff;
+  }
+}
+
 h1,
 h2,
 h3,

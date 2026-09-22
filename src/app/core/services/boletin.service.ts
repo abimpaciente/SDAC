@@ -7,6 +7,10 @@ import { FIRESTORE } from '../firebase/firebase-app.provider';
 
 export type SeccionConPartes = 'escuelaSabatica' | 'culto';
 
+export type FilaEscuelaSabatica =
+  | { tipo: 'campo'; clave: string; parte: ParteBoletin }
+  | { tipo: 'clase'; indice: number; parte: ParteBoletin };
+
 function parteVacia(titulo: string, orden: number): ParteBoletin {
   return { titulo, orden, valor: '', asignadoA: null };
 }
@@ -67,12 +71,52 @@ export class BoletinService {
   readonly boletin = signal<Boletin | null>(null);
   readonly cargando = signal(true);
   readonly existe = computed(() => this.boletin() !== null);
+  readonly errorCarga = signal<string | null>(null);
+
+  readonly partesEscuelaSabatica = computed<FilaEscuelaSabatica[]>(() => {
+    const seccion = this.boletin()?.escuelaSabatica;
+    if (!seccion) {
+      return [];
+    }
+    const campos: FilaEscuelaSabatica[] = [
+      { tipo: 'campo', clave: 'alabanzas', parte: seccion.alabanzas },
+      { tipo: 'campo', clave: 'bienvenida', parte: seccion.bienvenida },
+      { tipo: 'campo', clave: 'himnoInicial', parte: seccion.himnoInicial },
+      { tipo: 'campo', clave: 'lecturaBiblica', parte: seccion.lecturaBiblica },
+      { tipo: 'campo', clave: 'oracion', parte: seccion.oracion },
+      { tipo: 'campo', clave: 'elMisionero', parte: seccion.elMisionero },
+      { tipo: 'campo', clave: 'musicaEspecial', parte: seccion.musicaEspecial },
+      { tipo: 'campo', clave: 'himnoFinal', parte: seccion.himnoFinal },
+      { tipo: 'campo', clave: 'oracionFinal', parte: seccion.oracionFinal },
+      ...seccion.divisionClases.map((parte, indice): FilaEscuelaSabatica => ({ tipo: 'clase', indice, parte })),
+    ];
+    return campos.sort((a, b) => a.parte.orden - b.parte.orden);
+  });
+
+  readonly partesCulto = computed<{ clave: string; parte: ParteBoletin }[]>(() => {
+    const seccion = this.boletin()?.culto;
+    if (!seccion) {
+      return [];
+    }
+    return (Object.keys(seccion) as (keyof SeccionCulto)[])
+      .map((clave) => ({ clave, parte: seccion[clave] }))
+      .sort((a, b) => a.parte.orden - b.parte.orden);
+  });
 
   constructor() {
-    onSnapshot(doc(this.firestore, 'boletines', this.fecha), (snapshot) => {
-      this.boletin.set(snapshot.exists() ? (snapshot.data() as Boletin) : null);
-      this.cargando.set(false);
-    });
+    onSnapshot(
+      doc(this.firestore, 'boletines', this.fecha),
+      (snapshot) => {
+        this.boletin.set(snapshot.exists() ? (snapshot.data() as Boletin) : null);
+        this.cargando.set(false);
+        this.errorCarga.set(null);
+      },
+      (error) => {
+        console.error('Error al escuchar el boletín:', error);
+        this.errorCarga.set(error.message);
+        this.cargando.set(false);
+      },
+    );
   }
 
   async crearBoletinDeEstaSemana(): Promise<void> {
@@ -81,6 +125,8 @@ export class BoletinService {
       iglesiaId: environment.iglesiaIdPorDefecto,
       fecha: this.fecha,
       publicado: false,
+      ocaso: '',
+      horaCulto: '',
       escuelaSabatica: escuelaSabaticaVacia(),
       culto: cultoVacio(),
       anuncios: [],
@@ -112,6 +158,10 @@ export class BoletinService {
     await updateDoc(doc(this.firestore, 'boletines', this.fecha), {
       'escuelaSabatica.divisionClases': clases,
     });
+  }
+
+  async actualizarEncabezado(ocaso: string, horaCulto: string): Promise<void> {
+    await updateDoc(doc(this.firestore, 'boletines', this.fecha), { ocaso, horaCulto });
   }
 
   async actualizarAnuncios(anuncios: AnuncioBoletin[]): Promise<void> {

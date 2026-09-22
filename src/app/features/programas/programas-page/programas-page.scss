@@ -33,3 +33,18 @@
     color: #fff;
   }
 }
+
+.programas__subtitulo {
+  font-size: 17px;
+  margin-bottom: var(--espacio-sm);
+}
+
+.programas__contenido {
+  margin-bottom: var(--espacio-lg);
+}
+
+.programas__vacio {
+  text-align: center;
+  opacity: 0.6;
+  margin-top: var(--espacio-lg);
+}

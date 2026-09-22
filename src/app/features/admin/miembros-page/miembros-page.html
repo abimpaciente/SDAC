@@ -30,6 +30,13 @@
 <h2 class="miembros__subtitulo">Miembros</h2>
 <p class="miembros__ayuda">Asigna roles y ministerios. Los cambios se guardan al instante.</p>
 
+@if (errorCarga()) {
+  <p class="miembros__error">No se pudo cargar la lista: {{ errorCarga() }}</p>
+}
+@if (errorGuardado()) {
+  <p class="miembros__error">{{ errorGuardado() }}</p>
+}
+
 @if (cargando()) {
   <p class="miembros__vacio">Cargando…</p>
 } @else {

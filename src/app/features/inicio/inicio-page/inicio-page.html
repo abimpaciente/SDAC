@@ -16,12 +16,22 @@
   <div class="inicio__eventos-encabezado">
     <h2>Próximos eventos</h2>
     @if (puedeEditar() && !mostrandoFormulario()) {
-      <button type="button" class="boton-exportar" (click)="abrirNuevo()">Agregar evento</button>
+      <button type="button" class="boton-secundario" (click)="abrirNuevo()">Agregar evento</button>
     }
   </div>
 
+  @if (errorCargaEventos()) {
+    <p class="evento-form__error">No se pudieron cargar los eventos: {{ errorCargaEventos() }}</p>
+  }
+  @if (errorGuardado() && !mostrandoFormulario()) {
+    <p class="evento-form__error">{{ errorGuardado() }}</p>
+  }
+
   @if (mostrandoFormulario()) {
     <form class="tarjeta evento-form" (ngSubmit)="guardar()">
+      @if (errorGuardado()) {
+        <p class="evento-form__error">{{ errorGuardado() }}</p>
+      }
       <label class="evento-form__campo">
         <span>Título</span>
         <input type="text" [ngModel]="titulo()" (ngModelChange)="titulo.set($event)" name="titulo" required />

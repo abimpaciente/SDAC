@@ -127,6 +127,12 @@
   }
 }
 
+.evento-form__error {
+  color: var(--color-vino);
+  font-size: 14px;
+  margin: 0 0 var(--espacio-sm);
+}
+
 .evento-form__acciones {
   display: flex;
   justify-content: flex-end;

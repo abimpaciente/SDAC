@@ -28,9 +28,11 @@ export class MiembrosPage {
 
   protected readonly usuarios = this.usuariosService.usuarios;
   protected readonly cargando = this.usuariosService.cargando;
+  protected readonly errorCarga = this.usuariosService.errorCarga;
   protected readonly roles = ROLES;
   protected readonly ministerios = MINISTERIOS_CONOCIDOS;
   protected readonly guardandoUid = signal<string | null>(null);
+  protected readonly errorGuardado = signal<string | null>(null);
 
   protected readonly iglesia = this.iglesiaService.iglesia;
   protected readonly editandoIglesia = signal(false);
@@ -59,11 +61,22 @@ export class MiembrosPage {
 
   private async guardar(uid: string, rol: Rol, ministerio: string | null): Promise<void> {
     this.guardandoUid.set(uid);
+    this.errorGuardado.set(null);
     try {
       await this.usuariosService.actualizarRol(uid, rol, ministerio);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
     } finally {
       this.guardandoUid.set(null);
     }
+  }
+
+  private mensajeError(error: unknown): string {
+    const codigo = (error as { code?: string })?.code;
+    if (codigo === 'permission-denied') {
+      return 'No tienes permiso para hacer esto.';
+    }
+    return 'No se pudo guardar. Intenta de nuevo.';
   }
 
   protected abrirEdicionIglesia(): void {
@@ -81,12 +94,15 @@ export class MiembrosPage {
       return;
     }
     this.guardandoIglesia.set(true);
+    this.errorGuardado.set(null);
     try {
       await this.iglesiaService.actualizar({
         nombre: this.nombreIglesia().trim(),
         direccion: this.direccionIglesia().trim(),
       });
       this.editandoIglesia.set(false);
+    } catch (error) {
+      this.errorGuardado.set(this.mensajeError(error));
     } finally {
       this.guardandoIglesia.set(false);
     }

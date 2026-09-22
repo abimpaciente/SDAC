@@ -49,6 +49,10 @@ export interface Boletin {
   iglesiaId: string;
   fecha: string;
   publicado: boolean;
+  /** Hora del ocaso ("Sunset"), texto libre (p. ej. "8:09 pm"). */
+  ocaso: string;
+  /** Hora del servicio de adoración, texto libre (p. ej. "10:55 AM"). */
+  horaCulto: string;
   escuelaSabatica: SeccionEscuelaSabatica;
   culto: SeccionCulto;
   anuncios: AnuncioBoletin[];
