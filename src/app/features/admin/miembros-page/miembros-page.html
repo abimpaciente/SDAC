@@ -1,0 +1,43 @@
+<header class="miembros__encabezado">
+  <h1>Miembros</h1>
+  <p>Asigna roles y ministerios. Los cambios se guardan al instante.</p>
+</header>
+
+@if (cargando()) {
+  <p class="miembros__vacio">Cargando…</p>
+} @else {
+  @for (usuario of usuarios(); track usuario.uid) {
+    <article class="tarjeta miembros__fila">
+      <div class="miembros__persona">
+        <span class="miembros__nombre">{{ usuario.nombre }}</span>
+        <span class="miembros__email">{{ usuario.email }}</span>
+      </div>
+
+      <div class="miembros__controles">
+        <select
+          [disabled]="guardandoUid() === usuario.uid"
+          (change)="cambiarRol(usuario, $any($event.target).value)"
+        >
+          @for (rol of roles; track rol.valor) {
+            <option [value]="rol.valor" [selected]="rol.valor === usuario.rol">{{ rol.etiqueta }}</option>
+          }
+        </select>
+
+        @if (usuario.rol === 'lider_ministerio') {
+          <select
+            [disabled]="guardandoUid() === usuario.uid"
+            (change)="cambiarMinisterio(usuario, $any($event.target).value)"
+          >
+            @for (ministerio of ministerios; track ministerio) {
+              <option [value]="ministerio" [selected]="ministerio === usuario.ministerio">
+                {{ ministerio }}
+              </option>
+            }
+          </select>
+        }
+      </div>
+    </article>
+  } @empty {
+    <p class="miembros__vacio">Todavía no hay miembros registrados.</p>
+  }
+}

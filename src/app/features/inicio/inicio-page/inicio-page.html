@@ -12,16 +12,66 @@
 </section>
 
 <section class="inicio__eventos" aria-label="Próximos eventos">
-  <h2>Próximos eventos</h2>
+  <div class="inicio__eventos-encabezado">
+    <h2>Próximos eventos</h2>
+    @if (puedeEditar() && !mostrandoFormulario()) {
+      <button type="button" class="boton-exportar" (click)="abrirNuevo()">Agregar evento</button>
+    }
+  </div>
 
-  @for (evento of eventos; track evento.id) {
+  @if (mostrandoFormulario()) {
+    <form class="tarjeta evento-form" (ngSubmit)="guardar()">
+      <label class="evento-form__campo">
+        <span>Título</span>
+        <input type="text" [ngModel]="titulo()" (ngModelChange)="titulo.set($event)" name="titulo" required />
+      </label>
+      <label class="evento-form__campo">
+        <span>Fecha y hora</span>
+        <input
+          type="datetime-local"
+          [ngModel]="fecha()"
+          (ngModelChange)="fecha.set($event)"
+          name="fecha"
+          required
+        />
+      </label>
+      <label class="evento-form__campo">
+        <span>Lugar</span>
+        <input type="text" [ngModel]="lugar()" (ngModelChange)="lugar.set($event)" name="lugar" />
+      </label>
+      <label class="evento-form__campo">
+        <span>Descripción</span>
+        <textarea rows="2" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)" name="descripcion"></textarea>
+      </label>
+      <div class="evento-form__acciones">
+        <button type="button" class="evento-form__cancelar" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="boton-primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : editandoId() ? 'Guardar cambios' : 'Crear evento' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @for (evento of eventos(); track evento.id) {
     <article class="evento tarjeta">
       <h3>{{ evento.titulo }}</h3>
       <p class="evento__fecha">{{ formatearFecha(evento.fecha) }}</p>
-      <p>{{ evento.descripcion }}</p>
-      <p class="evento__lugar">{{ evento.lugar }}</p>
+      @if (evento.descripcion) {
+        <p>{{ evento.descripcion }}</p>
+      }
+      @if (evento.lugar) {
+        <p class="evento__lugar">{{ evento.lugar }}</p>
+      }
+      @if (puedeEditar()) {
+        <div class="evento__acciones">
+          <button type="button" (click)="abrirEdicion(evento)">Editar</button>
+          <button type="button" (click)="eliminar(evento)">Eliminar</button>
+        </div>
+      }
     </article>
   } @empty {
-    <p>No hay eventos programados por ahora.</p>
+    @if (!cargando()) {
+      <p>No hay eventos programados por ahora.</p>
+    }
   }
 </section>

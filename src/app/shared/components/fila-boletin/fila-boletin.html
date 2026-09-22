@@ -1,14 +1,53 @@
-<div class="fila-boletin">
-  <span class="fila-boletin__titulo">{{ parte().titulo }}</span>
+@if (editando()) {
+  <div class="fila-boletin fila-boletin--edicion">
+    <span class="fila-boletin__titulo">{{ parte().titulo }}</span>
 
-  @if (parte().valor || parte().asignadoA) {
-    <span class="fila-boletin__valor">
-      {{ parte().valor || parte().asignadoA }}
-      @if (parte().valor && parte().asignadoA) {
-        <span class="fila-boletin__responsable">— {{ parte().asignadoA }}</span>
-      }
-    </span>
-  } @else {
-    <span class="fila-boletin__valor por-asignar">Por asignar</span>
-  }
-</div>
+    @if (candidatos().length) {
+      <div class="fila-boletin__candidatos">
+        @for (candidato of candidatos(); track candidato.id) {
+          <button type="button" class="fila-boletin__candidato" (click)="usarCandidato(candidato)">
+            {{ candidato.texto }}
+          </button>
+        }
+      </div>
+    }
+
+    <input
+      class="fila-boletin__input"
+      type="text"
+      placeholder="Contenido (p. ej. el himno o el texto)"
+      [(ngModel)]="valorEditado"
+    />
+    <input
+      class="fila-boletin__input"
+      type="text"
+      placeholder="Responsable (opcional)"
+      [(ngModel)]="asignadoEditado"
+    />
+
+    <div class="fila-boletin__acciones">
+      <button type="button" class="fila-boletin__cancelar" (click)="cancelar()">Cancelar</button>
+      <button type="button" class="boton-primario fila-boletin__guardar" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+} @else {
+  <button
+    type="button"
+    class="fila-boletin"
+    [class.fila-boletin--editable]="editable()"
+    (click)="abrirEdicion()"
+  >
+    <span class="fila-boletin__titulo">{{ parte().titulo }}</span>
+
+    @if (parte().valor || parte().asignadoA) {
+      <span class="fila-boletin__valor">
+        {{ parte().valor || parte().asignadoA }}
+        @if (parte().valor && parte().asignadoA) {
+          <span class="fila-boletin__responsable">— {{ parte().asignadoA }}</span>
+        }
+      </span>
+    } @else {
+      <span class="fila-boletin__valor por-asignar">Por asignar</span>
+    }
+  </button>
+}

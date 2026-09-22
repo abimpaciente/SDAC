@@ -1,6 +1,6 @@
 <header class="boletin__encabezado">
   <h1>Boletín semanal</h1>
-  <button type="button" class="boton-exportar" (click)="exportarPdf()">Exportar a PDF</button>
+  <button type="button" class="boton-secundario" (click)="exportarPdf()">Exportar a PDF</button>
 </header>
 
 <nav class="boletin__tabs" aria-label="Secciones del boletín">
@@ -16,24 +16,71 @@
   }
 </nav>
 
-<section class="tarjeta boletin__contenido">
-  @switch (tabActiva()) {
-    @case ('escuelaSabatica') {
-      @for (parte of partesEscuelaSabatica(); track parte.orden) {
-        <app-fila-boletin [parte]="parte" />
-      }
+@if (cargando()) {
+  <p class="boletin__vacio">Cargando…</p>
+} @else if (!boletin()) {
+  <section class="tarjeta boletin__vacio-tarjeta">
+    <p>Todavía no se ha creado el boletín de esta semana.</p>
+    @if (puedeEditarTodo()) {
+      <button type="button" class="boton-primario" [disabled]="creando()" (click)="crearBoletin()">
+        {{ creando() ? 'Creando…' : 'Crear boletín de esta semana' }}
+      </button>
     }
-    @case ('culto') {
-      @for (parte of partesCulto(); track parte.orden) {
-        <app-fila-boletin [parte]="parte" />
-      }
-    }
-    @case ('anuncios') {
-      <ol class="lista-anuncios">
-        @for (anuncio of boletin.anuncios; track anuncio.orden) {
-          <li [innerHTML]="formatearAnuncio(anuncio.texto)"></li>
+  </section>
+} @else {
+  <section class="tarjeta boletin__contenido">
+    @switch (tabActiva()) {
+      @case ('escuelaSabatica') {
+        @for (fila of partesEscuelaSabatica(); track fila.parte.orden) {
+          <app-fila-boletin
+            [parte]="fila.parte"
+            [editable]="puedeEditarSeccion('escuelaSabatica')"
+            [candidatos]="candidatos()"
+            (guardado)="guardarEscuelaSabatica(fila, $event)"
+          />
         }
-      </ol>
+      }
+      @case ('culto') {
+        @for (fila of partesCulto(); track fila.parte.orden) {
+          <app-fila-boletin
+            [parte]="fila.parte"
+            [editable]="puedeEditarSeccion('culto')"
+            [candidatos]="candidatos()"
+            (guardado)="guardarCulto(fila.clave, $event)"
+          />
+        }
+      }
+      @case ('anuncios') {
+        @if (editandoAnuncios()) {
+          <div class="boletin__anuncios-editor">
+            <p class="boletin__anuncios-ayuda">
+              Un anuncio por línea. Usa **texto** para negritas.
+            </p>
+            <textarea
+              rows="6"
+              [value]="textoAnuncios()"
+              (input)="textoAnuncios.set($any($event.target).value)"
+            ></textarea>
+            <div class="boletin__anuncios-acciones">
+              <button type="button" class="boton-texto" (click)="cancelarEdicionAnuncios()">
+                Cancelar
+              </button>
+              <button type="button" class="boton-primario" (click)="guardarAnuncios()">Guardar</button>
+            </div>
+          </div>
+        } @else {
+          <ol class="lista-anuncios">
+            @for (anuncio of boletin()!.anuncios; track anuncio.orden) {
+              <li [innerHTML]="formatearAnuncio(anuncio.texto)"></li>
+            } @empty {
+              <p class="por-asignar">Por asignar</p>
+            }
+          </ol>
+          @if (puedeEditarTodo()) {
+            <button type="button" class="boton-secundario" (click)="abrirEdicionAnuncios()">Editar anuncios</button>
+          }
+        }
+      }
     }
-  }
-</section>
+  </section>
+}

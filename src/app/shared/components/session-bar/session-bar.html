@@ -2,6 +2,9 @@
   @if (!auth.cargando()) {
     @if (auth.usuario(); as usuario) {
       <span class="barra-sesion__nombre">{{ usuario.nombre }}</span>
+      @if (usuario.rol === 'administrador') {
+        <a class="barra-sesion__accion" routerLink="/admin/miembros">Administrar</a>
+      }
       <button type="button" class="barra-sesion__accion" (click)="cerrarSesion()">Salir</button>
     } @else {
       <a class="barra-sesion__accion" routerLink="/login">Iniciar sesión</a>

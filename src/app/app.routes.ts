@@ -25,5 +25,10 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./features/auth/login-page/login-page').then((m) => m.LoginPage),
   },
+  {
+    path: 'admin/miembros',
+    loadComponent: () =>
+      import('./features/admin/miembros-page/miembros-page').then((m) => m.MiembrosPage),
+  },
   { path: '**', redirectTo: 'inicio' },
 ];

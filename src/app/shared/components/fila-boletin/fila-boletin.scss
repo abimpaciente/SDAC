@@ -5,9 +5,27 @@
   gap: var(--espacio-md);
   padding: 10px 0;
   border-bottom: 1px solid var(--color-borde);
+  width: 100%;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  background: transparent;
+  font-family: var(--font-body);
+  color: var(--color-texto);
+  text-align: left;
+  cursor: default;
 
   &:last-child {
     border-bottom: none;
+  }
+
+  &--editable {
+    cursor: pointer;
+    border-radius: 8px;
+
+    &:hover {
+      background: var(--color-dorado-suave);
+    }
   }
 
   &__titulo {
@@ -24,4 +42,58 @@
     opacity: 0.65;
     font-size: 13px;
   }
+}
+
+.fila-boletin--edicion {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--espacio-sm);
+  padding: var(--espacio-sm) 0 var(--espacio-md);
+}
+
+.fila-boletin__candidatos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fila-boletin__candidato {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid var(--color-salvia-texto);
+  background: var(--color-salvia);
+  color: var(--color-salvia-texto);
+  border-radius: var(--radio-chip);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fila-boletin__input {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  width: 100%;
+}
+
+.fila-boletin__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-sm);
+}
+
+.fila-boletin__cancelar {
+  border: none;
+  background: transparent;
+  color: var(--color-texto);
+  opacity: 0.6;
+  font-weight: 600;
+  cursor: pointer;
 }

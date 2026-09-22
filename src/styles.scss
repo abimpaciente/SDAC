@@ -102,6 +102,32 @@ button {
   }
 }
 
+// Botón de acción secundaria (outline vino), reutilizado en toda la app.
+.boton-secundario {
+  border: 1px solid var(--color-vino);
+  background: transparent;
+  color: var(--color-vino);
+  border-radius: var(--radio-chip);
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-vino);
+    color: #fff;
+  }
+}
+
+// Botón "texto" discreto (cancelar, descartar, etc).
+.boton-texto {
+  border: none;
+  background: transparent;
+  color: var(--color-texto);
+  opacity: 0.6;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 // Layout compartido por las pantallas placeholder (features aún no
 // implementadas del todo).
 .pagina-en-construccion__encabezado {

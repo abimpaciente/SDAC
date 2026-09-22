@@ -77,26 +77,28 @@ service cloud.firestore {
       allow read: if estaAutenticado() && perteneceAIglesia(resource.data.iglesiaId);
       allow create: if estaAutenticado() && request.auth.uid == userId;
       // Un usuario puede editar su propio perfil pero no su rol/iglesia;
-      // solo un administrador puede cambiar roles o ministerio asignado.
+      // solo un administrador de ESA MISMA iglesia puede cambiar roles o
+      // ministerio asignado (evita que un admin de otra congregación
+      // toque usuarios que no son suyos).
       allow update: if estaAutenticado() && (
         (
           request.auth.uid == userId &&
           request.resource.data.rol == resource.data.rol &&
           request.resource.data.iglesiaId == resource.data.iglesiaId
         ) ||
-        esAdmin()
+        (esAdmin() && perteneceAIglesia(resource.data.iglesiaId))
       );
-      allow delete: if esAdmin();
+      allow delete: if esAdmin() && perteneceAIglesia(resource.data.iglesiaId);
     }
 
     match /boletines/{boletinId} {
       allow read: if true;
-      allow create: if esSecretario();
+      allow create: if esSecretario() && perteneceAIglesia(request.resource.data.iglesiaId);
       allow update: if perteneceAIglesia(resource.data.iglesiaId) && (
         esSecretario() ||
         (esLiderDeMinisterio() && soloTocaMiSeccionDelBoletin())
       );
-      allow delete: if esAdmin();
+      allow delete: if esAdmin() && perteneceAIglesia(resource.data.iglesiaId);
     }
 
     match /contribuciones/{contribucionId} {
@@ -115,18 +117,25 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['agregadoABoletin']) ||
         (esLiderDeMinisterio() || esSecretario())
       );
-      allow delete: if resource.data.autorId == request.auth.uid || esAdmin();
+      allow delete: if resource.data.autorId == request.auth.uid ||
+        (esAdmin() && perteneceAIglesia(resource.data.iglesiaId));
     }
 
     match /programasJovenes/{fecha} {
       allow read: if true;
-      allow write: if perteneceAIglesia(request.resource.data.iglesiaId) &&
-        (esSecretario() || (esLiderDeMinisterio() && miMinisterio() == 'Sociedad de Jóvenes'));
+      function puedeEscribirPrograma() {
+        return esSecretario() || (esLiderDeMinisterio() && miMinisterio() == 'Sociedad de Jóvenes');
+      }
+      allow create: if perteneceAIglesia(request.resource.data.iglesiaId) && puedeEscribirPrograma();
+      allow update: if perteneceAIglesia(resource.data.iglesiaId) && puedeEscribirPrograma();
+      allow delete: if esSecretario() && perteneceAIglesia(resource.data.iglesiaId);
     }
 
     match /eventos/{eventoId} {
       allow read: if true;
-      allow write: if esSecretario();
+      allow create: if esSecretario() && perteneceAIglesia(request.resource.data.iglesiaId);
+      allow update: if esSecretario() && perteneceAIglesia(resource.data.iglesiaId);
+      allow delete: if esSecretario() && perteneceAIglesia(resource.data.iglesiaId);
     }
   }
 }
