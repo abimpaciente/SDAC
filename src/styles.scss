@@ -63,12 +63,43 @@ button {
     background: var(--color-salvia);
     color: var(--color-salvia-texto);
   }
+
+  &--dorado {
+    background: var(--color-dorado-suave);
+    color: var(--color-dorado);
+  }
+
+  &--vino {
+    background: transparent;
+    border: 1px solid var(--color-vino);
+    color: var(--color-vino);
+  }
 }
 
 // Estado "Por asignar" dentro del boletín.
 .por-asignar {
   color: var(--color-dorado);
   font-style: italic;
+}
+
+// Botón de acción principal, reutilizado en formularios de toda la app.
+.boton-primario {
+  background: var(--color-vino);
+  color: #fff;
+  border: none;
+  border-radius: var(--radio-chip);
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--color-vino-oscuro);
+  }
 }
 
 // Layout compartido por las pantallas placeholder (features aún no

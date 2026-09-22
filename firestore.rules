@@ -104,11 +104,15 @@ service cloud.firestore {
       allow create: if estaAutenticado() &&
         request.resource.data.autorId == request.auth.uid &&
         perteneceAIglesia(request.resource.data.iglesiaId);
-      // El autor puede editar su propio mensaje; marcar
-      // `agregadoABoletin` queda reservado a líderes/secretaría/admin.
+      // El autor puede editar su propio mensaje. Cualquier miembro de la
+      // misma iglesia puede marcar/desmarcar el mensaje como candidato al
+      // boletín (es una sugerencia liviana); incorporarlo a un lugar
+      // específico del boletín sigue siendo trabajo de líderes/secretaría
+      // al editar esa sección.
       allow update: if perteneceAIglesia(resource.data.iglesiaId) && (
         (resource.data.autorId == request.auth.uid &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['texto', 'tipo'])) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['agregadoABoletin']) ||
         (esLiderDeMinisterio() || esSecretario())
       );
       allow delete: if resource.data.autorId == request.auth.uid || esAdmin();

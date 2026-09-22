@@ -1,11 +1,60 @@
-<header class="pagina-en-construccion__encabezado">
+<header class="compartir__encabezado">
   <h1>Compartir</h1>
 </header>
 
-<section class="tarjeta pagina-en-construccion">
-  <p>
-    Aquí vivirá el feed de la comunidad: himnos, citas bíblicas y anuncios que cualquier miembro
-    puede compartir, con la opción de marcarlos como candidatos para el boletín semanal.
-  </p>
-  <p class="pagina-en-construccion__nota">Próximamente.</p>
+<nav class="compartir__filtros" aria-label="Filtrar por categoría">
+  <button
+    type="button"
+    class="compartir__filtro"
+    [class.compartir__filtro--activo]="filtro() === 'todos'"
+    (click)="seleccionarFiltro('todos')"
+  >
+    Todos
+  </button>
+  @for (tipo of tipos; track tipo.valor) {
+    <button
+      type="button"
+      class="compartir__filtro"
+      [class.compartir__filtro--activo]="filtro() === tipo.valor"
+      (click)="seleccionarFiltro(tipo.valor)"
+    >
+      {{ tipo.etiqueta }}
+    </button>
+  }
+</nav>
+
+@if (sesionResuelta()) {
+  @if (usuario(); as autor) {
+    <form class="tarjeta compartir__composer" [formGroup]="form" (ngSubmit)="publicar()">
+      <select formControlName="tipo" aria-label="Categoría">
+        @for (tipo of tipos; track tipo.valor) {
+          <option [value]="tipo.valor">{{ tipo.etiqueta }}</option>
+        }
+      </select>
+      <textarea
+        formControlName="texto"
+        rows="2"
+        placeholder="Comparte un himno, una cita bíblica, un anuncio..."
+      ></textarea>
+      <button type="submit" class="boton-primario" [disabled]="enviando()">
+        {{ enviando() ? 'Publicando…' : 'Publicar' }}
+      </button>
+    </form>
+  } @else {
+    <a class="tarjeta compartir__cta" routerLink="/login" [queryParams]="{ volver: '/compartir' }">
+      Inicia sesión para publicar
+    </a>
+  }
+}
+
+<section class="compartir__feed" aria-label="Mensajes de la comunidad">
+  @for (contribucion of contribuciones(); track contribucion.id) {
+    <app-contribucion-card
+      [contribucion]="contribucion"
+      [puedeMarcarCandidato]="!!usuario()"
+      (candidatoAlternado)="alternarCandidato($event)"
+    />
+  } @empty {
+    <p class="compartir__vacio">Todavía no hay nada compartido en esta categoría.</p>
+  }
 </section>

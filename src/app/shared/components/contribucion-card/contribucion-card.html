@@ -1,0 +1,26 @@
+<article class="tarjeta contribucion">
+  <header class="contribucion__cabecera">
+    <span class="chip" [class]="tipoInfo()?.chip">{{ tipoInfo()?.etiqueta }}</span>
+    <span class="contribucion__fecha">{{ formatearFecha(contribucion().fecha) }}</span>
+  </header>
+
+  <p class="contribucion__texto">{{ contribucion().texto }}</p>
+
+  <footer class="contribucion__pie">
+    <span class="contribucion__autor">{{ contribucion().autorNombre }}</span>
+    <button
+      type="button"
+      class="contribucion__candidato"
+      [class.contribucion__candidato--activo]="contribucion().agregadoABoletin"
+      (click)="candidatoAlternado.emit(contribucion())"
+    >
+      {{
+        !puedeMarcarCandidato()
+          ? 'Inicia sesión para marcarlo'
+          : contribucion().agregadoABoletin
+            ? 'Candidato al boletín'
+            : 'Agregar al boletín'
+      }}
+    </button>
+  </footer>
+</article>

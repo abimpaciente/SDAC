@@ -12,4 +12,5 @@ export const environment = {
     appId: 'TU_APP_ID',
   },
   iglesiaIdPorDefecto: 'demo',
+  useEmulators: false,
 };

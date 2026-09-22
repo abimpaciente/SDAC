@@ -1,0 +1,25 @@
+.barra-sesion {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--espacio-sm);
+  padding: 8px var(--espacio-md);
+  min-height: 20px;
+  font-size: 13px;
+}
+
+.barra-sesion__nombre {
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.barra-sesion__accion {
+  border: none;
+  background: transparent;
+  color: var(--color-vino);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+}

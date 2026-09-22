@@ -17,24 +17,47 @@ npm install --legacy-peer-deps
 > entre `vitest` y sus paquetes opcionales de navegador, no relacionado con
 > este proyecto.
 
-### Firebase
+### Firebase — desarrollo con emuladores (por defecto)
+
+Mientras `environment.ts` tenga `useEmulators: true` (el valor por
+defecto), la app no necesita un proyecto real de Firebase: habla con los
+emuladores locales de Auth y Firestore.
+
+```bash
+npm run emulators   # deja esto corriendo en una terminal
+ng serve             # en otra terminal
+```
+
+Abre `http://localhost:4200/`. Puedes registrarte, iniciar sesión, publicar
+en Compartir, etc. — todo se guarda en el emulador (se pierde al
+detenerlo). La UI del emulador queda en `http://127.0.0.1:4000/`.
+
+> El emulador de Storage no está incluido en el script por un conflicto de
+> proxy en algunos entornos sandboxed; corre normalmente en una máquina
+> local (`firebase emulators:start --only auth,firestore,storage`).
+
+### Firebase — proyecto real (producción)
 
 1. Crea un proyecto en [Firebase Console](https://console.firebase.google.com/)
    con Firestore, Auth, Storage y Hosting habilitados.
 2. Copia las credenciales del SDK web y reemplázalas en
-   `src/environments/environment.ts` y `environment.prod.ts` (nunca
-   commitees credenciales reales — esos archivos solo deben contener
-   placeholders en el repo).
+   `src/environments/environment.prod.ts` (nunca commitees credenciales
+   reales — ese archivo solo debe contener placeholders en el repo). Pon
+   `useEmulators: false` si también quieres probar contra el proyecto real
+   desde `environment.ts`.
 3. Actualiza `.firebaserc` con el ID real del proyecto.
 4. Despliega las reglas de seguridad:
    ```bash
    firebase deploy --only firestore:rules,storage:rules
    ```
 
-Las reglas en `firestore.rules` validan el rol de cada usuario
-(`miembro`, `lider_ministerio`, `secretario`, `administrador`) del lado del
-servidor a partir de su propio documento en `usuarios/{uid}` — nunca
-confían en datos enviados por el cliente.
+Las reglas en `firestore.rules` dejan la lectura del contenido de la
+congregación (boletín, programas, eventos, el feed de Compartir) abierta a
+cualquier visitante sin sesión. Solo las escrituras (publicar, editar el
+boletín, asignar responsables) exigen autenticación, y el rol de cada
+usuario (`miembro`, `lider_ministerio`, `secretario`, `administrador`) se
+valida del lado del servidor a partir de su propio documento en
+`usuarios/{uid}` — nunca se confía en datos enviados por el cliente.
 
 ## Servidor de desarrollo
 
@@ -43,7 +66,8 @@ ng serve
 ```
 
 Abre `http://localhost:4200/`. La app recarga automáticamente al modificar
-los archivos fuente.
+los archivos fuente. Para probar login/Compartir necesitas también tener
+los emuladores corriendo (ver arriba).
 
 ## Build
 
@@ -67,21 +91,28 @@ src/app/
   core/
     models/      # Interfaces de datos (Iglesia, Usuario, Boletin, ...)
     firebase/    # Providers de Firebase (App, Auth, Firestore, Storage)
+    auth/        # AuthService (Firebase Auth + doc usuarios/{uid})
+    services/    # Acceso a datos (ContribucionesService, ...)
   features/
-    auth/        # Login/registro
+    auth/        # Login/registro (real, Firebase Auth)
     inicio/      # Accesos directos + próximos eventos
-    compartir/   # Feed tipo chat de la comunidad
+    compartir/   # Feed de la comunidad (real, Firestore)
     boletin/     # Boletín semanal (Escuela Sabática / Culto / Anuncios)
     programas/   # Flujo de Escuela Sabática y Sociedad de Jóvenes
   shared/
-    components/  # Componentes reutilizables (nav inferior, filas del boletín)
-    layout/      # Shell de la app
-    mock/        # Datos de ejemplo mientras se conecta Firestore
+    components/  # Componentes reutilizables (nav inferior, tarjetas, ...)
+    layout/      # Shell de la app (nav inferior + barra de sesión)
+    mock/        # Datos de ejemplo (Inicio, Boletín, Programas)
 ```
 
 ## Estado actual
 
-Implementado con datos mock (sin conexión a Firestore todavía): layout con
-nav inferior, Inicio, Boletín (con exportar a PDF vía impresión del
-navegador) y Programas. Compartir y Login son pantallas placeholder
-pendientes de implementación.
+- **Real, conectado a Firebase (Auth + Firestore)**: registro/login por
+  email, Compartir (publicar, filtrar por categoría, marcar como candidato
+  al boletín — cualquier miembro autenticado puede hacerlo, no solo
+  líderes).
+- **Con datos mock** (pendiente de conectar a Firestore): Inicio, Boletín
+  (con exportar a PDF vía impresión del navegador) y Programas.
+- Editar el boletín / programas desde la app (con los permisos por
+  ministerio) todavía no está implementado — por ahora esos datos se
+  editarían directamente en Firestore.
