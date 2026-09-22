@@ -6,6 +6,9 @@ const MENSAJES: Record<string, string> = {
   'auth/user-not-found': 'Correo o contraseña incorrectos.',
   'auth/wrong-password': 'Correo o contraseña incorrectos.',
   'auth/too-many-requests': 'Demasiados intentos. Espera un momento e intenta de nuevo.',
+  'auth/popup-closed-by-user': 'Cerraste la ventana de Google antes de terminar.',
+  'auth/popup-blocked': 'El navegador bloqueó la ventana emergente. Permite ventanas emergentes e intenta de nuevo.',
+  'auth/operation-not-allowed': 'Ese método de inicio de sesión no está habilitado todavía.',
 };
 
 export function mensajeErrorAuth(error: unknown): string {

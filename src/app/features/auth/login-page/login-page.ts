@@ -41,15 +41,23 @@ export class LoginPage {
     }
 
     const { nombre, email, password } = this.form.getRawValue();
+    await this.completarAcceso(() =>
+      this.modo() === 'registro'
+        ? this.auth.registrar(nombre.trim(), email, password)
+        : this.auth.iniciarSesion(email, password),
+    );
+  }
+
+  protected async continuarConGoogle(): Promise<void> {
+    await this.completarAcceso(() => this.auth.continuarConGoogle());
+  }
+
+  private async completarAcceso(accion: () => Promise<void>): Promise<void> {
     this.enviando.set(true);
     this.error.set(null);
 
     try {
-      if (this.modo() === 'registro') {
-        await this.auth.registrar(nombre.trim(), email, password);
-      } else {
-        await this.auth.iniciarSesion(email, password);
-      }
+      await accion();
       const volver = this.route.snapshot.queryParamMap.get('volver') ?? '/inicio';
       await this.router.navigateByUrl(volver);
     } catch (error) {

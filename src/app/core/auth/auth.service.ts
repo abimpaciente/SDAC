@@ -1,9 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import {
+  GoogleAuthProvider,
   User as UsuarioFirebase,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
 } from 'firebase/auth';
@@ -66,6 +68,19 @@ export class AuthService {
     await signInWithEmailAndPassword(this.auth, email, password);
   }
 
+  async continuarConGoogle(): Promise<void> {
+    this.registrando = true;
+    try {
+      const credencial = await signInWithPopup(this.auth, new GoogleAuthProvider());
+      const perfilExistente = await this.cargarPerfil(credencial.user);
+      const usuario = perfilExistente ?? (await this.crearPerfilDesdeGoogle(credencial.user));
+      this.usuario.set(usuario);
+      this.cargando.set(false);
+    } finally {
+      this.registrando = false;
+    }
+  }
+
   async cerrarSesion(): Promise<void> {
     await signOut(this.auth);
   }
@@ -80,5 +95,20 @@ export class AuthService {
       // como "sin perfil" en vez de romper el flujo de autenticación.
       return undefined;
     }
+  }
+
+  /** Primera vez que alguien entra con Google: crea su perfil como 'miembro'. */
+  private async crearPerfilDesdeGoogle(usuarioFirebase: UsuarioFirebase): Promise<Usuario> {
+    const nuevoUsuario: Usuario = {
+      uid: usuarioFirebase.uid,
+      nombre: usuarioFirebase.displayName ?? usuarioFirebase.email ?? 'Sin nombre',
+      email: usuarioFirebase.email,
+      telefono: null,
+      rol: 'miembro',
+      ministerio: null,
+      iglesiaId: environment.iglesiaIdPorDefecto,
+    };
+    await setDoc(doc(this.firestore, 'usuarios', usuarioFirebase.uid), nuevoUsuario);
+    return nuevoUsuario;
   }
 }

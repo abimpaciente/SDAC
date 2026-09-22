@@ -6,9 +6,11 @@
 
 .nav-inferior {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 50%;
   bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  transform: translateX(-50%);
   display: flex;
   justify-content: space-around;
   align-items: center;

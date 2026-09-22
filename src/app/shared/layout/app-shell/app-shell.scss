@@ -1,5 +1,19 @@
+// Ancho máximo tipo "app móvil": en pantallas anchas (escritorio) la app
+// queda centrada en una columna angosta en vez de estirarse de borde a
+// borde; en celular (donde vive de verdad) no cambia nada.
+$ancho-app: 480px;
+
 :host {
   display: block;
+  min-height: 100vh;
+}
+
+@media (min-width: #{$ancho-app + 1px}) {
+  :host {
+    max-width: $ancho-app;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(42, 36, 32, 0.08);
+  }
 }
 
 .barra-sesion {
