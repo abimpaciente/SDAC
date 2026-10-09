@@ -4,6 +4,31 @@
   <p>Bienvenido/a a la comunidad</p>
 </header>
 
+@if (iglesia(); as datos) {
+  @if (datos.horarioEscuelaSabatica || datos.horarioCulto || datos.horarioOracion) {
+    <section class="inicio__horarios" aria-label="Horarios de servicio">
+      @if (datos.horarioEscuelaSabatica) {
+        <div class="inicio__horario">
+          <span class="inicio__horario-etiqueta">Escuela Sabática</span>
+          <span class="inicio__horario-valor">{{ datos.horarioEscuelaSabatica }}</span>
+        </div>
+      }
+      @if (datos.horarioCulto) {
+        <div class="inicio__horario">
+          <span class="inicio__horario-etiqueta">Culto</span>
+          <span class="inicio__horario-valor">{{ datos.horarioCulto }}</span>
+        </div>
+      }
+      @if (datos.horarioOracion) {
+        <div class="inicio__horario">
+          <span class="inicio__horario-etiqueta">Oración</span>
+          <span class="inicio__horario-valor">{{ datos.horarioOracion }}</span>
+        </div>
+      }
+    </section>
+  }
+}
+
 <section class="inicio__accesos" aria-label="Accesos directos">
   @for (acceso of accesos; track acceso.ruta + (acceso.queryParams?.['tab'] ?? '')) {
     <a class="acceso-directo tarjeta" [routerLink]="acceso.ruta" [queryParams]="acceso.queryParams">
@@ -92,15 +117,6 @@
     <h2>Acerca de</h2>
     @if (datos.pastor) {
       <p><span class="inicio__acerca-etiqueta">Pastor:</span> {{ datos.pastor }}</p>
-    }
-    @if (datos.horarioEscuelaSabatica) {
-      <p><span class="inicio__acerca-etiqueta">Escuela Sabática:</span> {{ datos.horarioEscuelaSabatica }}</p>
-    }
-    @if (datos.horarioCulto) {
-      <p><span class="inicio__acerca-etiqueta">Culto:</span> {{ datos.horarioCulto }}</p>
-    }
-    @if (datos.horarioOracion) {
-      <p><span class="inicio__acerca-etiqueta">Oración:</span> {{ datos.horarioOracion }}</p>
     }
     @if (datos.telefono) {
       <p><span class="inicio__acerca-etiqueta">Teléfono:</span> {{ datos.telefono }}</p>
