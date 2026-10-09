@@ -1,25 +1,36 @@
 // Tokens del sistema de diseño de Maranatha.
+// Paleta azul marino, alineada a la identidad oficial de la Iglesia
+// Adventista del Séptimo Día (tomada del sitio oficial de la
+// congregación). Los nombres de variable (--color-vino, etc.) se
+// mantienen por compatibilidad con el resto del código, aunque los
+// valores ya no son los originales marfil/vino — ver comentarios.
+//
 // Expuestos como custom properties para que también estén disponibles
 // dentro de los estilos encapsulados de cada componente.
 
 :root {
   // Superficies y texto
-  --color-fondo: #faf6ee;
-  --color-texto: #2a2420;
+  --color-fondo: #f5f7fa;
+  --color-texto: #1c2733;
   --color-tarjeta: #ffffff;
-  --color-borde: #e7dcc8;
+  --color-borde: #dce3ea;
 
-  // Acentos
-  --color-vino: #7b3232;
-  --color-vino-oscuro: #5f2626;
-  --color-dorado: #b98a2e;
-  --color-dorado-suave: #f4e6cc;
+  // Acentos — azul marino oficial (antes vino). Botones primarios, tabs
+  // activos, nav inferior.
+  --color-vino: #0f2d4e;
+  --color-vino-oscuro: #0a1f38;
+  // Dorado: se mantiene para estados "por asignar"/pendiente — contraste
+  // cálido clásico junto al azul marino.
+  --color-dorado: #b8893a;
+  --color-dorado-suave: #f3e8d2;
 
   // Categorías / estados
-  --color-salvia: #dce7de;
-  --color-salvia-texto: #3e6650;
-  --color-terracota: #ead9d9;
-  --color-terracota-texto: #7b3232;
+  --color-salvia: #d7e8e6;
+  --color-salvia-texto: #2f6b63;
+  // "Terracota" ahora es un azul cielo claro (chip por defecto, p. ej.
+  // "Cita bíblica") — mismo azul medio del logo/enlaces del sitio oficial.
+  --color-terracota: #dceaf5;
+  --color-terracota-texto: #1d6fb8;
 
   // Tipografía
   --font-display: 'Fraunces', serif;
