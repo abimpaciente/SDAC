@@ -46,6 +46,7 @@ export class MiembrosPage {
   protected readonly horarioCultoIglesia = signal('');
   protected readonly horarioOracionIglesia = signal('');
   protected readonly sitioWebOficialIglesia = signal('');
+  protected readonly logoUrlIglesia = signal('');
 
   constructor() {
     // Solo administradores pueden estar aquí; a cualquier otro (o mientras
@@ -97,6 +98,7 @@ export class MiembrosPage {
     this.horarioCultoIglesia.set(i?.horarioCulto ?? '');
     this.horarioOracionIglesia.set(i?.horarioOracion ?? '');
     this.sitioWebOficialIglesia.set(i?.sitioWebOficial ?? '');
+    this.logoUrlIglesia.set(i?.logoUrl ?? '');
     this.editandoIglesia.set(true);
   }
 
@@ -118,6 +120,7 @@ export class MiembrosPage {
       horarioCulto: this.horarioCultoIglesia().trim(),
       horarioOracion: this.horarioOracionIglesia().trim(),
       sitioWebOficial: this.sitioWebOficialIglesia().trim(),
+      logoUrl: this.logoUrlIglesia().trim(),
     };
     this.guardandoIglesia.set(true);
     this.errorGuardado.set(null);

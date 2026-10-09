@@ -16,6 +16,7 @@ export type DatosIglesia = Pick<
   | 'horarioCulto'
   | 'horarioOracion'
   | 'sitioWebOficial'
+  | 'logoUrl'
 >;
 
 @Injectable({ providedIn: 'root' })

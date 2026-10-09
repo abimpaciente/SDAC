@@ -1,4 +1,7 @@
 <header class="inicio__encabezado">
+  @if (iglesia()?.logoUrl) {
+    <img class="inicio__logo" [src]="iglesia()!.logoUrl" alt="Logo de {{ nombreIglesia() }}" />
+  }
   <p class="inicio__eyebrow">Maranatha</p>
   <h1>{{ nombreIglesia() }}</h1>
   <p>Bienvenido/a a la comunidad</p>

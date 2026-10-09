@@ -17,6 +17,15 @@
   }
 }
 
+.inicio__logo {
+  display: block;
+  height: 56px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  margin-bottom: var(--espacio-sm);
+}
+
 .inicio__eyebrow {
   margin: 0;
   font-size: 12px;

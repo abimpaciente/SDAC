@@ -60,6 +60,22 @@
         (ngModelChange)="sitioWebOficialIglesia.set($event)"
       />
     </label>
+    <label class="miembros__campo">
+      <span>URL del logo</span>
+      <input
+        type="url"
+        placeholder="https://… (un enlace directo a la imagen)"
+        [ngModel]="logoUrlIglesia()"
+        (ngModelChange)="logoUrlIglesia.set($event)"
+      />
+      <span class="miembros__campo-ayuda">
+        Por ahora, pega un enlace directo a la imagen (p. ej. subida a Google Drive o Facebook con
+        acceso público). Más adelante podemos agregar la opción de subir el archivo directamente.
+      </span>
+    </label>
+    @if (logoUrlIglesia()) {
+      <img class="miembros__logo-vista-previa" [src]="logoUrlIglesia()" alt="Vista previa del logo" />
+    }
     <div class="miembros__iglesia-acciones">
       <button type="button" class="boton-texto" (click)="cancelarEdicionIglesia()">Cancelar</button>
       <button type="button" class="boton-primario" [disabled]="guardandoIglesia()" (click)="guardarIglesia()">

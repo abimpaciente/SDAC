@@ -50,6 +50,24 @@
   }
 }
 
+.miembros__campo-ayuda {
+  font-weight: 400;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.miembros__logo-vista-previa {
+  display: block;
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+  margin-bottom: var(--espacio-sm);
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  padding: var(--espacio-xs);
+  background: #fff;
+}
+
 .miembros__iglesia-acciones {
   display: flex;
   justify-content: flex-end;
